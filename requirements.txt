@@ -1,8 +1,6 @@
 streamlit 
 pandas 
-matplotlib.pyplot 
+matplotlib 
 numpy 
 requests
 joblib
-os
-pathlib 
