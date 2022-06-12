@@ -6,13 +6,11 @@ import requests
 import joblib
 import os
 from pathlib import Path
-from lime.lime_tabular import LimeTabularExplainer
-from sklearn.neighbors import NearestNeighbors
 
 #CURRENT_FOLDER = Path.cwd()
 CURRENT_FOLDER= os.getcwd()
-PROJECT_FOLDER = Path(CURRENT_FOLDER).parent.parent
-DATA_FOLDER = PROJECT_FOLDER /'P7'
+PROJECT_FOLDER = Path(CURRENT_FOLDER)
+DATA_FOLDER = PROJECT_FOLDER
 # Liste des clients ID
 lst_id=joblib.load(DATA_FOLDER/'lst_id.joblib')
 
@@ -21,8 +19,10 @@ lst_id=joblib.load(DATA_FOLDER/'lst_id.joblib')
 #affichage formulaire
 st.title('Dashboard Scoring Credit')
 
-url_FastAPI = 'http://127.0.0.1:8000/'
-
+url_FastAPI = os.environ.get(
+    'API_URL',
+    'http://127.0.0.1:8000/'
+)
 
 def request_prediction(model_uri, client_id):
     headers = {"Content-Type": "application/json"}

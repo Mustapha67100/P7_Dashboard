@@ -1,0 +1,8 @@
+streamlit 
+pandas 
+matplotlib.pyplot 
+numpy 
+requests
+joblib
+os
+pathlib 
