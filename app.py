@@ -61,7 +61,12 @@ def main():
     if predict_btn:
         prediction= request_prediction(url_FastAPI, client_id)
         #pred = pd.DataFrame(prediction, columns=prediction.keys())
-        pred = pd.DataFrame(eval(prediction), columns=['0','1']) 
+        #pred = pd.DataFrame(eval(prediction), columns=['0','1'])
+        pred = pd.DataFrame(
+        # prediction est un dico venant de l'API
+        prediction['proba'],
+        columns=['0','1']
+        ) 
          
         st.dataframe(pred)
         print(pred)
