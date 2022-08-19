@@ -4,3 +4,5 @@ matplotlib
 numpy 
 requests
 joblib
+streamlit_shap
+shap
