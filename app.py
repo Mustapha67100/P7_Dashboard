@@ -17,9 +17,8 @@ DATA_FOLDER = PROJECT_FOLDER
 # Liste des clients ID
 lst_id=joblib.load(DATA_FOLDER/'lst_id.joblib')
 shap_values=joblib.load(DATA_FOLDER/'shap_values.joblib')
-
 data_test=joblib.load(DATA_FOLDER/'data_test_sub_cutoff.joblib')
-#model=joblib.load(DATA_FOLDER/'model_rf_20000.joblib')
+
 
 
 
