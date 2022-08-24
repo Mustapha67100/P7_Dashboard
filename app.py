@@ -18,6 +18,7 @@ DATA_FOLDER = PROJECT_FOLDER
 # Liste des clients ID
 lst_id=joblib.load(DATA_FOLDER/'lst_id.joblib')
 shap_values=joblib.load(DATA_FOLDER/'shap_values.joblib')
+#shap_values=joblib.load(DATA_FOLDER/'shap_values_log.joblib')
 data_test=joblib.load(DATA_FOLDER/'data_test_sub_cutoff.joblib')
 
 # Titre du Dashbord
@@ -57,94 +58,98 @@ def main():
     # Requête permettant de récupérer la liste des variable
     VAR1 = st.sidebar.selectbox("Veuillez saisir VAR1", data_test.columns)
     VAR2 = st.sidebar.selectbox("Veuillez saisir VAR2", data_test.columns)
-    
+   
     # Affichage solvabilité client
-    st.header("**Lecement de la prédiction**")
-    predict_btn = st.button('Prédire') 
+    #st.header("**Lecement de la prédiction**")
+    #predict_btn = st.button('Prédire') 
     
     # Calcul de la prédiction ( probabilité)
-    if predict_btn:
-        prediction= request_prediction(url_FastAPI, client_id)
-        pred = pd.DataFrame(
-        # prediction est un dico venant de l'API
-        prediction['proba'],
-        columns=['0','1']
-        ) 
-        st.header("**Résultats de la prédiction**")
-        st.markdown("<u>Probabilité de risque de faillite d'un client :</u>", unsafe_allow_html=True)
-        # Afficher les résultats de la prédiction dans un dataframe
-        st.dataframe(pred)
+    #if predict_btn:
+    prediction= request_prediction(url_FastAPI, client_id)
+    pred = pd.DataFrame(
+    # prediction est un dico venant de l'API
+    prediction['proba'],
+    columns=['0','1']
+    ) 
+    #st.header("**Résultats de la prédiction**")
+    #st.markdown("<u>Probabilité de risque de faillite d'un client :</u>", unsafe_allow_html=True)
+    # Afficher les résultats de la prédiction dans un dataframe
+    #st.dataframe(pred)
         
-        # Visualiser  la prediction sous forme d'un "PIE"
-        labels = ["Solvable", "Non solvable"]
-        Probabilty = [pred.iloc[0,0], pred.iloc[0,1]]
-        fig1, ax1 = plt.subplots()
-        ax1.pie(Probabilty, labels=labels, autopct='%1.1f%%', startangle=90)
-        ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-        st.pyplot(fig1, clear_figure=True)
+    # Visualiser  la prediction sous forme d'un "PIE"
+    labels = ["Solvable", "Non solvable"]
+    Probabilty = [pred.iloc[0,0], pred.iloc[0,1]]
+    
+    # Fonction de Coût : Aide à la décision en fonction du seuil de solvabilité    
+    st.header("**Aide à la décision en fonction du seuil de solvabilité**")
+    st.markdown("<u> Aide à la décision en fonction du seuil de solvabilité déterminé par la Fonction de Coût :</u>",unsafe_allow_html=True )
+    Seuil_1 = 0.3
+    Seuil_2 = 0.5
+    if pred.iloc[0,1] <= Seuil_1:
+    #st.sidebar.markdown("<u>Différence solvabilité / non solvabilité</u>", unsafe_allow_html=True)
+     #st.sidebar.markdown("<i> Ce client  est solvable</i>", unsafe_allow_html=True)
+        st.success("Client fiable : Probabilité de la classe 1 est inférieure à 0.3")
+    elif pred.iloc[0,1] >= Seuil_1 and pred.iloc[0,1] <= Seuil_2:
+    #st.sidebar.markdown("<i> Ce client  n'est pas solvable</i>", unsafe_allow_html=True) 
+        st.warning("Client risqué : Probabilité de la classe 1  comprise entre 0.3 et 0.5" )
+    else :  
+    #st.sidebar.markdown("<i> Ce client  n'est pas solvable</i>", unsafe_allow_html=True) 
+        st.error("Client à rejeter : Probabilité de la classe 1 est superieure à 0.5")
+    
+    
+    #fig1, ax1 = plt.subplots()
+    #ax1.pie(Probabilty, labels=labels, autopct='%1.1f%%', startangle=90)
+    #ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    #st.pyplot(fig1, clear_figure=True)
+    
+    # Features Importance : Shap Explainer (visualiser des informations descriptives relatives à un client)
+    st.header("**Features importance**")
+    st.markdown("<u>Informations descriptives relatives à un client donné</u>", unsafe_allow_html=True)
         
-        st.header("**Aide à la décision en fonction du seuil de solvabilité**")
-        # Fonction de Coût : Aide à la décision en fonction du seuil de solvabilité
-        st.markdown("<u> Aide à la décision en fonction du seuil de solvabilité déterminé par la Fonction de Coût :</u>",unsafe_allow_html=True )
-        Seuil_1 = 0.3
-        Seuil_2 = 0.5
-        if pred.iloc[0,1] <= Seuil_1:
-            #st.sidebar.markdown("<u>Différence solvabilité / non solvabilité</u>", unsafe_allow_html=True)
-            #st.sidebar.markdown("<i> Ce client  est solvable</i>", unsafe_allow_html=True)
-            st.success("Client fiable")
-            st.balloons()
-        elif pred.iloc[0,1] >= Seuil_1 and pred.iloc[0,1] <= Seuil_2:
-            #st.sidebar.markdown("<i> Ce client  n'est pas solvable</i>", unsafe_allow_html=True) 
-            st.warning("Client risqué")
-        else :  
-            #st.sidebar.markdown("<i> Ce client  n'est pas solvable</i>", unsafe_allow_html=True) 
-            st.error("Client à rejeter")
-            
-        # Features Importance : Shap Explainer (visualiser des informations descriptives relatives à un client)
-        st.header("**Features importance**")
-        st.markdown("<u>Informations descriptives relatives à un client donné</u>", unsafe_allow_html=True)
-        
-        #st_shap(shap.plots.beeswarm(shap_values))
-        st_shap(shap.plots.waterfall(shap_values[lst_id.index(client_id)]))
+    #st_shap(shap.plots.beeswarm(shap_values))
+    st_shap(shap.plots.waterfall(shap_values[lst_id.index(client_id)],max_display=10 ))
+    
         #
         
-        # Comparer les informations descriptives relatives à un client 
-        # à l’ensemble des clients ou à un groupe de clients similaires.
-        # Cas 1 : étude en fonction d'une seule variable
-        st.header("Positionnement d'un client par rapport à un groupe de clients")
-        st.markdown("<u>Comparaison entre les informations descriptives relatives à un client donné et celles d'un groupe de clients</u>", unsafe_allow_html=True)
-        st.markdown("<u>Cas 1 : étude en fonction d'une seule variable</u>", unsafe_allow_html=True)
-        arr=data_test[[VAR1]]
-        fig2, ax2 = plt.subplots()
-        ax2.hist(arr, bins=40)
-        v = data_test.loc[client_id, VAR1]
-        legend = f"Client {client_id}"
-        pd.DataFrame(
-         {
-         VAR1: [v, v,],
-         legend : [0, 200, ],
-         }
-         ).plot.line(x=VAR1, y=legend, ax=ax2)
-        st.pyplot(fig2)
+    # Comparer les informations descriptives relatives à un client 
+    # à l’ensemble des clients ou à un groupe de clients similaires.
+    # Cas 1 : étude en fonction d'une seule variable
+    st.header("Positionnement d'un client par rapport à un groupe de clients")
+    st.markdown("<u>Comparaison entre les informations descriptives relatives à un client donné et celles d'un groupe de clients</u>", unsafe_allow_html=True)
+    st.markdown("<u>Cas 1 : étude en fonction d'une seule variable</u>", unsafe_allow_html=True)
+    st.markdown("## Comparer les informations descriptives relatives à un client à l’ensemble des clients", unsafe_allow_html=True)
+    fig2, ax2 = plt.subplots()
+    ax2.hist(data_test[[VAR1]], bins=40)
+    y_bounds = ax2.get_ylim()
+    v = data_test.loc[client_id, VAR1]
+    legend_label = f"Client {client_id}"
+    pd.DataFrame(
+        {
+        VAR1: [v, v,],
+        legend_label : y_bounds,
+        }
+    ).plot.line(x=VAR1, y=legend_label, ax=ax2)
+    st.pyplot(fig2)
         
-        # Cas 2 : étude en fonction de deux varibles
-        st.markdown("<u>Cas 2 : étude en fonction de deux varibles</u>", unsafe_allow_html=True)
-        fig3, ax3 = plt.subplots()
-        data_test.plot.scatter(VAR1,VAR2,
-            c = "blue",
-            marker = '1',
-            alpha = 0.2,
-            ax=ax3,
-        )
-        data_test[data_test.index == client_id].plot.scatter(VAR1,VAR2,
-            c = "green",
-            marker = 'X', s=100,
-            alpha = 1,
-            ax = ax3,
-        )
-        st.pyplot(fig3)
-
-    return      
+    # Cas 2 : étude en fonction de deux varibles
+    st.markdown("<u>Cas 2 : étude en fonction de deux varibles</u>", unsafe_allow_html=True)
+    fig3, ax3 = plt.subplots()
+    data_test.plot.scatter(VAR1,VAR2,
+        c = "blue",
+        marker = '1',
+        alpha = 0.2,
+        ax=ax3,
+    )
+    data_test[data_test.index == client_id].plot.scatter(VAR1,VAR2,
+        c = "green",
+        marker = 'X', s=100,
+        alpha = 1,
+        ax = ax3,
+    )
+    st.pyplot(fig3)
+        
+    
+    #return      
    
 if __name__ == '__main__':
 	main()
