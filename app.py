@@ -85,16 +85,17 @@ def main():
     st.markdown("<u> Aide à la décision en fonction du seuil de solvabilité déterminé par la Fonction de Coût :</u>",unsafe_allow_html=True )
     Seuil_1 = 0.3
     Seuil_2 = 0.5
-    if pred.iloc[0,1] <= Seuil_1:
+    proba=pred.iloc[0,1]
+    if proba <= Seuil_1:
     #st.sidebar.markdown("<u>Différence solvabilité / non solvabilité</u>", unsafe_allow_html=True)
      #st.sidebar.markdown("<i> Ce client  est solvable</i>", unsafe_allow_html=True)
-        st.success("Client fiable : Seuil de probabilité de la classe 1 est inférieure à 0.3")
-    elif pred.iloc[0,1] >= Seuil_1 and pred.iloc[0,1] <= Seuil_2:
+        st.success(f"Client fiable : Probabilité de défaut {proba:4.2f} inférieure à {Seuil_1:4.2f}")
+    elif  proba <= Seuil_2:
     #st.sidebar.markdown("<i> Ce client  n'est pas solvable</i>", unsafe_allow_html=True) 
-        st.warning("Client risqué : Seuil de probabilité de la classe 1  compris entre 0.3 et 0.5" )
+        st.warning(f"Client risqué : Probabilité de défaut {proba:4.2f} comprise entre {Seuil_1:4.2f} et {Seuil_2:4.2f}" )
     else :  
     #st.sidebar.markdown("<i> Ce client  n'est pas solvable</i>", unsafe_allow_html=True) 
-        st.error("Client à rejeter : Seuil de probabilité de la classe 1 est supérieur à 0.5")
+        st.error(f"Client à rejeter : Probabilité de défaut {proba:4.2f} supérieure à {Seuil_2:4.2f}")
     
     
     #fig1, ax1 = plt.subplots()
@@ -109,6 +110,7 @@ def main():
     #st_shap(shap.plots.beeswarm(shap_values))
     st_shap(shap.plots.waterfall(shap_values[lst_id.index(client_id)],max_display=10 ))
     
+                     
         #
         
     # Comparer les informations descriptives relatives à un client 
