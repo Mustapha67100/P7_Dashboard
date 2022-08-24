@@ -88,13 +88,13 @@ def main():
     if pred.iloc[0,1] <= Seuil_1:
     #st.sidebar.markdown("<u>Différence solvabilité / non solvabilité</u>", unsafe_allow_html=True)
      #st.sidebar.markdown("<i> Ce client  est solvable</i>", unsafe_allow_html=True)
-        st.success("Client fiable : Probabilité de la classe 1 est inférieure à 0.3")
+        st.success("Client fiable : Seuil de probabilité de la classe 1 est inférieure à 0.3")
     elif pred.iloc[0,1] >= Seuil_1 and pred.iloc[0,1] <= Seuil_2:
     #st.sidebar.markdown("<i> Ce client  n'est pas solvable</i>", unsafe_allow_html=True) 
-        st.warning("Client risqué : Probabilité de la classe 1  comprise entre 0.3 et 0.5" )
+        st.warning("Client risqué : Seuil de probabilité de la classe 1  compris entre 0.3 et 0.5" )
     else :  
     #st.sidebar.markdown("<i> Ce client  n'est pas solvable</i>", unsafe_allow_html=True) 
-        st.error("Client à rejeter : Probabilité de la classe 1 est superieure à 0.5")
+        st.error("Client à rejeter : Seuil de probabilité de la classe 1 est supérieur à 0.5")
     
     
     #fig1, ax1 = plt.subplots()
